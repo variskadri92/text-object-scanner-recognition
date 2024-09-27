@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:text_and_object_scanner/screens/Homescreen.dart';
 import 'package:text_and_object_scanner/onboarding_screen.dart';
 
@@ -16,6 +17,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
+        fontFamily: GoogleFonts.montserrat().fontFamily,
+
         // This is the theme of your application.
         //
         // TRY THIS: Try running your application with "flutter run". You'll see

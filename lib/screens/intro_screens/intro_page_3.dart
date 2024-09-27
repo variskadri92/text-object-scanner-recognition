@@ -13,8 +13,7 @@ class IntroPage3 extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Center(
-            child: Lottie.network(
-                'https://lottie.host/1aca7970-dd1c-4aa9-a41b-7d11fc6a68a4/GvR2ILNfeR.json'),
+            child: Image.asset('assets/animation3.gif')
           ),
           Text("Copy,translate and share",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
           Container(

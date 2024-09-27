@@ -15,8 +15,7 @@ class IntroPage1 extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Center(
-            child: Lottie.network(
-                'https://lottie.host/aa7b0d9c-10b7-443e-83ae-f9f9262b0f18/yotnY3r9VW.json'),
+            child: Image.asset('assets/animation1.gif'),
           ),
           Text("Welcome to Image-to-Text App!",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
           Container(

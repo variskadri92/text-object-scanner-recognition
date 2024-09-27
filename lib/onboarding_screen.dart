@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:text_and_object_scanner/screens/Homescreen.dart';
+import 'package:text_and_object_scanner/screens/home_screen.dart';
 import 'package:text_and_object_scanner/screens/intro_screens/intro_page_1.dart';
 import 'package:text_and_object_scanner/screens/intro_screens/intro_page_2.dart';
 import 'package:text_and_object_scanner/screens/intro_screens/intro_page_3.dart';
@@ -47,7 +48,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         onTap: () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
-                            return Homescreen();
+                            return HomeScreendemo();
                           }));
                         },
                         child: Text('Done',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,),),
