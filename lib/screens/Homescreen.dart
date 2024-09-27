@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:text_and_object_scanner/recognition_screen.dart';
+import 'package:text_and_object_scanner/screens/recognition_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
