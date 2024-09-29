@@ -1,4 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:text_and_object_scanner/screens/recognition_screen.dart';
 
 class HomeScreendemo extends StatefulWidget {
   const HomeScreendemo({super.key});
@@ -8,6 +13,74 @@ class HomeScreendemo extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreendemo> {
+  File? _image; // To store the captured image
+  final ImagePicker _picker = ImagePicker();
+  String? _ocrText;
+  bool _isLoading = false;
+
+  // Function to open the camera
+  Future<void> _openCamera() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _openGallery() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _sendImageToServer(File image) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final request = http.MultipartRequest('POST', Uri.parse('http://192.168.29.5:5000/api'));
+    request.files.add(await http.MultipartFile.fromPath('image', image.path));
+
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseBody = await response.stream.bytesToString();
+      final decoded = json.decode(responseBody);
+      setState(() {
+        _ocrText = decoded['text'];
+        _isLoading = false;
+      });
+
+      // Navigate to the recognition screen after OCR text is set
+      _navigateToRecognitionScreen();
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error: ${response.reasonPhrase}');
+    }
+  }
+
+  // Function to navigate to the RecognitionScreen
+  void _navigateToRecognitionScreen() {
+    if (_image != null && _ocrText != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RecognitionScreen(image: _image!, ocrText: _ocrText!),
+        ),
+      );
+    } else {
+      print('Image or OCR text is not available');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,36 +88,46 @@ class _HomeScreenState extends State<HomeScreendemo> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.deepPurple[500],
-        title: (Text("Text and Object Recognizer",style: TextStyle(color: Colors.grey[300]),)),
+        title: Text(
+          "Text and Object Recognizer",
+          style: TextStyle(color: Colors.grey[300]),
+        ),
       ),
       body: Column(
         children: [
           SizedBox(
-            height: 400, // Increase overall height for more spacious layout
+            height: 400,
             child: Row(
               children: [
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      elevation: 10,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple[300],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        height: 350,
-                        width: 100,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                                height: 150,
-                                width: 150,
-                                child: Image.asset('assets/camera.png')),
-                            SizedBox(height: 20,),
-                            Text('Camera', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),)
-                          ],
+                  child: InkWell(
+                    onTap: _openCamera, // Open camera when tapped
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        elevation: 10,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.deepPurple[300],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          height: 350,
+                          width: 100,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                  height: 150,
+                                  width: 150,
+                                  child: Image.asset('assets/camera.png')),
+                              SizedBox(height: 20),
+                              Text(
+                                'Camera',
+                                style: TextStyle(
+                                    fontSize: 26, fontWeight: FontWeight.bold),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -52,52 +135,72 @@ class _HomeScreenState extends State<HomeScreendemo> {
                 ),
                 Column(
                   children: [
-                    Expanded(
-                      child: Card(
-                        elevation: 10,
-                        child: Container(
-                          height: 150, // Increased height for Gallery card
-                          width: 120, // Increase width for more spacious look
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurple[300],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                height: 80, // Adjust image height
-                                width: 80, // Adjust image width
-                                child: Image.asset('assets/gallery.png'),
-                              ),
-                              SizedBox(height: 10,), // Add some space between image and text
-                              Text('Gallery', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)
-                            ],
+                    InkWell(
+                      onTap: _openGallery,
+                      child: Expanded(
+                        child: Card(
+                          elevation: 10,
+                          child: Container(
+                            height: 150,
+                            width: 120,
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurple[300],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 80,
+                                  width: 80,
+                                  child: Image.asset('assets/gallery.png'),
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  'Gallery',
+                                  style: TextStyle(
+                                      fontSize: 20, fontWeight: FontWeight.bold),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: Card(
-                        elevation: 10,
-                        child: Container(
-                          height: 150, // Increased height for Scan card
-                          width: 120, // Increase width for more spacious look
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurple[300],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                height: 80, // Adjust image height
-                                width: 80, // Adjust image width
-                                child: Image.asset('assets/scanner.png'),
-                              ),
-                              SizedBox(height: 10,), // Add some space between image and text
-                              Text('Scan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)
-                            ],
+                    InkWell(
+                      onTap: () {
+                        if (_image != null) {
+                          _sendImageToServer(_image!);
+                        } else {
+                          print('No image selected');
+                        }
+                      },
+                      child: Expanded(
+                        child: Card(
+                          elevation: 10,
+                          child: Container(
+                            height: 150,
+                            width: 120,
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurple[300],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 80,
+                                  width: 80,
+                                  child: Image.asset('assets/scanner.png'),
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  'Extract',
+                                  style: TextStyle(
+                                      fontSize: 20, fontWeight: FontWeight.bold),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -106,7 +209,15 @@ class _HomeScreenState extends State<HomeScreendemo> {
                 )
               ],
             ),
+          ),
+          SizedBox(height: 20),
+          // Display captured image
+          _image != null
+              ? Image.file(
+            _image!,
+            height: 200,
           )
+              : Text('No image selected'),
         ],
       ),
     );

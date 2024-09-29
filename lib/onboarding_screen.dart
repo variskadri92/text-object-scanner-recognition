@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:text_and_object_scanner/screens/Homescreen.dart';
 import 'package:text_and_object_scanner/screens/home_screen.dart';
@@ -17,6 +18,28 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   PageController _controller = PageController();
   bool onLastPage = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestStoragePermission(); // Request permissions
+  }
+
+  // Function to request storage permissions
+  Future<void> _requestStoragePermission() async {
+    if (await Permission.storage.request().isGranted) {
+      print("Storage permission granted.");
+    } else {
+      print("Storage permission denied.");
+    }
+
+    if (await Permission.manageExternalStorage.request().isGranted) {
+      print("Manage External Storage permission granted.");
+    } else {
+      print("Manage External Storage permission denied.");
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
