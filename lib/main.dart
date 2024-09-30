@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:text_and_object_scanner/screens/Homescreen.dart';
 import 'package:text_and_object_scanner/onboarding_screen.dart';
 
 void main() {
