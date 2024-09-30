@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 
 class SavedFilesScreen extends StatefulWidget {
   @override
@@ -117,7 +118,6 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
               },
               child: Text('Cancel'),
             ),
-
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
@@ -136,6 +136,11 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
         );
       },
     );
+  }
+
+  // Function to share the file using Share Plus
+  void _shareFile(File file) {
+    Share.shareXFiles([XFile(file.path)], text: 'Check out this file!');
   }
 
   @override
@@ -158,6 +163,12 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
             onTap: () {
               _viewFileContentDialog(File(file.path)); // View and edit file content
             },
+            trailing: IconButton(
+              icon: Icon(Icons.share),
+              onPressed: () {
+                _shareFile(File(file.path)); // Share the file
+              },
+            ),
           );
         },
       ),
