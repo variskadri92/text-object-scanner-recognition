@@ -108,6 +108,7 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.grey[300],
           title: Text('Enter File Name'),
           content: TextField(
             controller: fileNameController,
@@ -144,8 +145,10 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.deepPurple[100],
       appBar: AppBar(
-        title: Text('OCR Result'),
+        backgroundColor: Colors.deepPurple[500],
+        title: Text('OCR Result',style: TextStyle(color: Colors.white),),
         actions: [
           IconButton(
             icon: Icon(Icons.save),
@@ -160,9 +163,27 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Display predicted class above the text field
-              Text(
-                'Predicted Class: ${widget.predictedClass}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Row(
+                children: [
+                  Text(
+                    'Type of Document: ',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.grey,
+
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        '${widget.predictedClass}',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.grey[200]),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: 10),
               Text(
@@ -170,17 +191,25 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              TextField(
-                controller: _textController,
-                maxLines: null,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)
+                ),
+                elevation: 4,
+                color: Colors.grey[200],
+                child: TextField(
+                  controller: _textController,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+
+                  ),
                 ),
               ),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _showFileNameDialog, // Show the dialog to enter the file name
-                child: Text('Save Edited Text'),
+                child: Text('Save Edited Text',style: TextStyle(fontWeight: FontWeight.bold),),
               ),
             ],
           ),
