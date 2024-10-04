@@ -96,6 +96,7 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.grey[400],
           title: Text(file.path.split('/').last),
           content: SingleChildScrollView(
             child: Column(
@@ -146,8 +147,10 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.deepPurple[100],
       appBar: AppBar(
-        title: Text('Saved Files'),
+        backgroundColor: Colors.deepPurple[500],
+        title: Text('Saved Files',style: TextStyle(color: Colors.white),),
       ),
       body: _directory == null
           ? Center(child: Text('No directory found'))
@@ -157,17 +160,20 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
         itemCount: _files.length,
         itemBuilder: (context, index) {
           FileSystemEntity file = _files[index];
-          return ListTile(
-            title: Text(file.path.split('/').last),
-            leading: Icon(Icons.insert_drive_file),
-            onTap: () {
-              _viewFileContentDialog(File(file.path)); // View and edit file content
-            },
-            trailing: IconButton(
-              icon: Icon(Icons.share),
-              onPressed: () {
-                _shareFile(File(file.path)); // Share the file
+          return Card(
+            color: Colors.deepPurple[300],
+            child: ListTile(
+              title: Text(file.path.split('/').last,style: TextStyle(color: Colors.grey[800]),),
+              leading: Icon(Icons.insert_drive_file,color: Colors.grey[800],),
+              onTap: () {
+                _viewFileContentDialog(File(file.path)); // View and edit file content
               },
+              trailing: IconButton(
+                icon: Icon(Icons.share,color: Colors.grey[800],),
+                onPressed: () {
+                  _shareFile(File(file.path)); // Share the file
+                },
+              ),
             ),
           );
         },
