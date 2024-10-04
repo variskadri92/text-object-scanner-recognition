@@ -6,8 +6,9 @@ import 'package:permission_handler/permission_handler.dart';
 class RecognitionScreen extends StatefulWidget {
   final File image;
   final String ocrText;
+  final String predictedClass;
 
-  RecognitionScreen({required this.image, required this.ocrText});
+  RecognitionScreen({required this.image, required this.ocrText, required this.predictedClass});
 
   @override
   _RecognitionScreenState createState() => _RecognitionScreenState();
@@ -73,112 +74,118 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-            title: Text('File Already Exists'),
-            content: Text('Do you want to overwrite $fileName.txt?'),
-            actions: [
+          title: Text('File Already Exists'),
+          content: Text('Do you want to overwrite $fileName.txt?'),
+          actions: [
             TextButton(
-            onPressed: () async {
-          await file.writeAsString(text); // Overwrite the file
-          print('Text overwritten in: ${file.path}');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('File overwritten: $fileName.txt')),
-          );
-          Navigator.of(context).pop(); // Close the dialog
-        },
-        child: Text('Yes'),
-        ),
-        TextButton(
-        onPressed: () {
-        Navigator.of(context).pop(); // Close the dialog without saving
-        },
-        child: Text('No, enter a different name'),
-        ),
-      ],
-    );
-  },
-  );
-}
-
-// Function to show a dialog for entering the file name
-void _showFileNameDialog() {
-  final TextEditingController fileNameController = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Enter File Name'),
-        content: TextField(
-          controller: fileNameController,
-          decoration: InputDecoration(hintText: "File name"),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              final fileName = fileNameController.text;
-              if (fileName.isNotEmpty) {
-                final editedText = _textController.text;
-                _saveTextToFile(editedText, fileName); // Attempt to save text
-              } else {
+              onPressed: () async {
+                await file.writeAsString(text); // Overwrite the file
+                print('Text overwritten in: ${file.path}');
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Please enter a valid file name.')),
+                  SnackBar(content: Text('File overwritten: $fileName.txt')),
                 );
-              }
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: Text('Save'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text('OCR Result'),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.save),
-          onPressed: _showFileNameDialog, // Show the dialog to enter the file name
-        ),
-      ],
-    ),
-    body: SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Recognized Text (Editable):',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Yes'),
             ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _textController,
-              maxLines: null,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _showFileNameDialog, // Show the dialog to enter the file name
-              child: Text('Save Edited Text'),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog without saving
+              },
+              child: Text('No, enter a different name'),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  // Function to show a dialog for entering the file name
+  void _showFileNameDialog() {
+    final TextEditingController fileNameController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter File Name'),
+          content: TextField(
+            controller: fileNameController,
+            decoration: InputDecoration(hintText: "File name"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final fileName = fileNameController.text;
+                if (fileName.isNotEmpty) {
+                  final editedText = _textController.text;
+                  _saveTextToFile(editedText, fileName); // Attempt to save text
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Please enter a valid file name.')),
+                  );
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('OCR Result'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: _showFileNameDialog, // Show the dialog to enter the file name
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Display predicted class above the text field
+              Text(
+                'Predicted Class: ${widget.predictedClass}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Recognized Text (Editable):',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: _textController,
+                maxLines: null,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _showFileNameDialog, // Show the dialog to enter the file name
+                child: Text('Save Edited Text'),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

@@ -16,7 +16,7 @@ class HomeScreendemo extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreendemo> {
   File? _image; // To store the captured image
   final ImagePicker _picker = ImagePicker();
-  String? _ocrText;
+  String? _ocrText,_predictedClass;
   bool _isLoading = false; // Variable to track loading state
 
   // Function to open the camera
@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreendemo> {
       _isLoading = true; // Set loading to true when the request starts
     });
 
-    final request = http.MultipartRequest('POST', Uri.parse('http://192.168.29.5:5000/api'));
+    final request = http.MultipartRequest('POST', Uri.parse('http://192.168.29.5:5000/process'));
     request.files.add(await http.MultipartFile.fromPath('image', image.path));
 
     final response = await request.send();
@@ -54,7 +54,10 @@ class _HomeScreenState extends State<HomeScreendemo> {
       final responseBody = await response.stream.bytesToString();
       final decoded = json.decode(responseBody);
       setState(() {
-        _ocrText = decoded['text'];
+        _ocrText = decoded['ocr_text'];
+        _predictedClass = decoded['predicted_class'];
+        print(_ocrText);
+        print(_predictedClass);
         _isLoading = false; // Stop loading when the request is complete
       });
 
@@ -70,11 +73,11 @@ class _HomeScreenState extends State<HomeScreendemo> {
 
   // Function to navigate to the RecognitionScreen
   void _navigateToRecognitionScreen() {
-    if (_image != null && _ocrText != null) {
+    if (_image != null && _ocrText != null && _predictedClass!=null) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => RecognitionScreen(image: _image!, ocrText: _ocrText!),
+          builder: (context) => RecognitionScreen(image: _image!, ocrText: _ocrText!, predictedClass: _predictedClass!,),
         ),
       );
     } else {
